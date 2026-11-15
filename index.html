@@ -1,966 +1,974 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeFlow | Visual Development Platform</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="data:,">
+    <title>蔚蓝守护 - 保护海洋</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://images.weserv.nl">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
         }
-        
+
+        :root {
+            --primary: #0369a1;
+            --secondary: #0891b2;
+            --accent: #06b6d4;
+            --accent-soft: #67e8f9;
+            --light: #f0f9ff;
+            --dark: #0c4a6e;
+            --deep: #082f49;
+            --text: #334155;
+            --white: #ffffff;
+            --card: #ffffff;
+            color-scheme: light;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light: #0b1c2c;
+                --text: #cbd5e1;
+                --card: #102a3f;
+                --dark: #7dd3fc;
+                color-scheme: dark;
+            }
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f9fbfd;
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.7;
         }
-        
-        h1, h2, h3, h4 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            line-height: 1.3;
+
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         }
-        
+
         .container {
-            width: 100%;
+            width: 90%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
         }
-        
-        /* Header & Navigation */
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        nav {
+
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
         }
-        
-        .logo-icon {
-            color: #4361ee;
-            font-size: 28px;
-            margin-right: 10px;
+
+        .logo i {
+            font-size: 1.9rem;
         }
-        
-        .logo-text {
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
+
+        .logo small {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.22em;
+            opacity: 0.85;
+            display: block;
+            line-height: 1.2;
         }
-        
-        .logo-text span {
-            color: #4361ee;
-        }
-        
-        .nav-links {
+
+        nav ul {
             display: flex;
             list-style: none;
         }
-        
-        .nav-links li {
-            margin-left: 30px;
+
+        nav ul li {
+            margin-left: 2rem;
         }
-        
-        .nav-links a {
+
+        nav ul li a {
+            color: var(--white);
             text-decoration: none;
-            color: #555;
             font-weight: 500;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            position: relative;
         }
-        
-        .nav-links a:hover {
-            color: #4361ee;
+
+        nav ul li a:hover {
+            color: var(--accent-soft);
         }
-        
-        .cta-button {
-            background-color: #4361ee;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-soft);
+            transition: width 0.3s ease;
         }
-        
-        .cta-button:hover {
-            background-color: #3a56d4;
-            transform: translateY(-2px);
+
+        nav ul li a:hover::after {
+            width: 100%;
         }
-        
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #333;
-            cursor: pointer;
-        }
-        
-        /* Hero Section */
+
         .hero {
-            padding: 150px 0 100px;
-            background: linear-gradient(135deg, #f0f4ff 0%, #f9fbfd 100%);
-        }
-        
-        .hero-content {
+            background: linear-gradient(rgba(4, 47, 72, 0.62), rgba(8, 74, 110, 0.38)), url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80');
+            background-size: cover;
+            background-position: center 62%;
+            min-height: 80vh;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-        
-        .hero-text {
-            flex: 1;
-            padding-right: 40px;
-        }
-        
-        .hero-text h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #222;
-        }
-        
-        .hero-text h1 span {
-            color: #4361ee;
-        }
-        
-        .hero-text p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .secondary-button {
-            background-color: white;
-            color: #4361ee;
-            border: 2px solid #4361ee;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .secondary-button:hover {
-            background-color: #f0f4ff;
-        }
-        
-        .hero-image {
-            flex: 1;
             text-align: center;
+            color: var(--white);
+            position: relative;
         }
-        
-        .hero-image img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(67, 97, 238, 0.15);
+
+        .hero-content {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 4rem 0 5rem;
         }
-        
-        /* Features Section */
+
+        .hero h1 {
+            font-size: 3.4rem;
+            font-weight: 900;
+            line-height: 1.25;
+            margin-bottom: 1.2rem;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.2rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero .btn-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.ghost {
+            background-color: rgba(255, 255, 255, 0.14);
+            border: 1.5px solid rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(2px);
+        }
+
+        .btn.ghost:hover {
+            background-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .hero-wave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            line-height: 0;
+        }
+
+        .hero-wave svg {
+            width: 100%;
+            height: 54px;
+            display: block;
+        }
+
+        .hero-wave path {
+            fill: var(--light);
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
         .section-title {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 3rem;
         }
-        
+
         .section-title h2 {
-            font-size: 36px;
-            color: #222;
-            margin-bottom: 15px;
-        }
-        
-        .section-title p {
-            color: #666;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        .features {
-            padding: 100px 0;
-            background-color: white;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-        
-        .feature-card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-icon {
-            background-color: #eef2ff;
-            color: #4361ee;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-        
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-        
-        .feature-card p {
-            color: #666;
-        }
-        
-        /* Benefits Section */
-        .benefits {
-            padding: 100px 0;
-            background-color: #f0f4ff;
-        }
-        
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .benefit-item {
-            text-align: center;
-            padding: 30px 20px;
-        }
-        
-        .benefit-icon {
-            color: #4361ee;
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-        
-        .benefit-item h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-        
-        .benefit-item p {
-            color: #666;
-        }
-        
-        /* Testimonials */
-        .testimonials {
-            padding: 100px 0;
-            background-color: white;
-        }
-        
-        .testimonial-slider {
-            max-width: 800px;
-            margin: 0 auto;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 1rem;
             position: relative;
+            display: inline-block;
         }
-        
-        .testimonial {
-            background: #f9fbfd;
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+
+        @media (prefers-color-scheme: dark) {
+            .section-title h2 { color: #7dd3fc; }
         }
-        
-        .testimonial-text {
-            font-size: 18px;
-            font-style: italic;
-            margin-bottom: 30px;
-            color: #555;
-        }
-        
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .author-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #ddd;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #4361ee;
-            font-size: 24px;
-        }
-        
-        .author-info h4 {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        
-        .author-info p {
-            color: #777;
-            font-size: 14px;
-        }
-        
-        /* Pricing Section */
-        .pricing {
-            padding: 100px 0;
-            background-color: #f9fbfd;
-        }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-        
-        .pricing-card {
-            background: white;
-            border-radius: 10px;
-            padding: 40px 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .pricing-card.featured {
-            border-top: 5px solid #4361ee;
-            transform: scale(1.05);
-            position: relative;
-        }
-        
-        .featured-badge {
+
+        .section-title h2::after {
+            content: '';
             position: absolute;
-            top: -12px;
+            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #4361ee;
-            color: white;
-            padding: 5px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent);
+            border-radius: 2px;
         }
-        
-        .pricing-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .pricing-card.featured:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-        
-        .plan-name {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .plan-price {
-            font-size: 48px;
-            font-weight: 700;
-            color: #4361ee;
-            margin-bottom: 20px;
-        }
-        
-        .plan-price span {
-            font-size: 16px;
-            color: #777;
-        }
-        
-        .plan-features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-        
-        .plan-features li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            color: #555;
-        }
-        
-        .plan-features li:last-child {
-            border-bottom: none;
-        }
-        
-        /* CTA Section */
-        .cta-section {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
-            text-align: center;
-            color: white;
-        }
-        
-        .cta-section h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-        
-        .cta-section p {
-            font-size: 18px;
+
+        .section-title p {
+            color: var(--text);
             max-width: 700px;
-            margin: 0 auto 30px;
-            opacity: 0.9;
+            margin: 0.6rem auto 0;
         }
-        
-        .cta-section .cta-button {
-            background-color: white;
-            color: #4361ee;
-            font-size: 16px;
-            padding: 15px 40px;
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
         }
-        
-        .cta-section .cta-button:hover {
-            background-color: #f0f4ff;
+
+        .about-img {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(3, 105, 161, 0.18);
         }
-        
-        /* Footer */
+
+        .about-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .about-img:hover img {
+            transform: scale(1.05);
+        }
+
+        .about-text h3 {
+            font-size: 1.7rem;
+            margin-bottom: 1.2rem;
+            color: var(--dark);
+        }
+
+        .about-text p {
+            margin-bottom: 1.2rem;
+        }
+
+        .about-text .hl {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .about-text .hl { color: #7dd3fc; }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.6rem;
+            margin-top: 3.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(3, 105, 161, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-8px);
+        }
+
+        .stat-item i {
+            font-size: 2.4rem;
+            color: var(--secondary);
+            margin-bottom: 0.9rem;
+        }
+
+        .stat-item h3 {
+            font-size: 2.3rem;
+            color: var(--dark);
+            margin-bottom: 0.4rem;
+            font-weight: 900;
+        }
+
+        .stat-item h3 .unit {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .stat-item p {
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .stats-note {
+            text-align: center;
+            margin-top: 1.4rem;
+            font-size: 0.85rem;
+            opacity: 0.75;
+        }
+
+        .initiatives {
+            background-color: var(--card);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .initiatives { background-color: #0d2236; }
+        }
+
+        .initiatives-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .initiative-card {
+            background-color: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(3, 105, 161, 0.08);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .initiative-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .initiative-img {
+            height: 210px;
+            overflow: hidden;
+        }
+
+        .initiative-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            display: block;
+        }
+
+        .initiative-card:hover .initiative-img img {
+            transform: scale(1.08);
+        }
+
+        .initiative-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .initiative-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .initiative-content h3 i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .initiative-content p {
+            margin-bottom: 1.4rem;
+            flex: 1;
+        }
+
+        .initiative-content .btn {
+            align-self: flex-start;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .actions-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.1rem 2.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            list-style: none;
+        }
+
+        .actions-list li {
+            display: flex;
+            gap: 0.9rem;
+            align-items: flex-start;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.1rem 1.3rem;
+            box-shadow: 0 4px 12px rgba(3, 105, 161, 0.07);
+        }
+
+        .actions-list .num {
+            flex: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .actions-list strong {
+            color: var(--dark);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .actions-list span {
+            font-size: 0.95rem;
+        }
+
+        .cta {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            text-align: center;
+            padding: 5rem 0;
+        }
+
+        .cta h2 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            margin-bottom: 1.3rem;
+        }
+
+        .cta p {
+            font-size: 1.15rem;
+            margin-bottom: 2.2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta .btn {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .cta .btn:hover {
+            background-color: var(--deep);
+            color: var(--white);
+        }
+
         footer {
-            background-color: #222;
-            color: #ccc;
-            padding: 70px 0 20px;
+            background-color: var(--deep);
+            color: var(--white);
+            padding: 3.5rem 0 1rem;
         }
-        
+
+        @media (prefers-color-scheme: dark) {
+            footer { background-color: #061826; }
+        }
+
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-        
+
         .footer-column h3 {
-            font-size: 20px;
-            color: white;
-            margin-bottom: 25px;
+            font-size: 1.25rem;
+            margin-bottom: 1.4rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: #fff;
         }
-        
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .footer-column p {
+            margin-bottom: 1rem;
+            color: #e0f2fe;
+            font-size: 0.97rem;
+        }
+
+        .footer-column p i {
+            width: 20px;
+            color: var(--accent-soft);
+        }
+
         .footer-links {
             list-style: none;
         }
-        
+
         .footer-links li {
-            margin-bottom: 12px;
+            margin-bottom: 0.8rem;
         }
-        
-        .footer-links a {
-            color: #aaa;
+
+        .footer-links li a {
+            color: #e0f2fe;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
         }
-        
-        .footer-links a:hover {
-            color: #4361ee;
+
+        .footer-links li a:hover {
+            color: var(--accent-soft);
+            padding-left: 5px;
         }
-        
+
+        .social-links {
+            display: flex;
+            gap: 0.9rem;
+            margin-top: 0.4rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
         .copyright {
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #444;
-            font-size: 14px;
-            color: #888;
+            padding-top: 1.8rem;
+            padding-bottom: 0.6rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            color: #bae6fd;
+            font-size: 0.92rem;
         }
-        
-        /* Responsive Design */
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #fff;
+            padding: 0.3rem;
+        }
+
         @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
+            .about-content {
+                grid-template-columns: 1fr;
             }
-            
-            .hero-text {
-                padding-right: 0;
-                margin-bottom: 50px;
-                text-align: center;
+
+            .initiatives-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            .hero-text p {
-                margin: 0 auto 30px;
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            .pricing-card.featured {
-                transform: none;
-            }
-            
-            .pricing-card.featured:hover {
-                transform: translateY(-10px);
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
-        
+
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+            .hero h1 {
+                font-size: 2.3rem;
             }
-            
-            .mobile-menu-btn {
+
+            .hero p {
+                font-size: 1.05rem;
+            }
+
+            section {
+                padding: 3.5rem 0;
+            }
+
+            .section-title h2 {
+                font-size: 1.9rem;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 1rem 0;
+                text-align: center;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 0;
+                padding: 0.8rem 0;
+            }
+
+            header { position: sticky; }
+            nav { position: static; }
+
+            .mobile-menu {
                 display: block;
             }
-            
-            .hero-text h1 {
-                font-size: 36px;
+
+            .initiatives-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .section-title h2 {
-                font-size: 30px;
+
+            .actions-list {
+                grid-template-columns: 1fr;
             }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
+
+            .footer-content {
+                grid-template-columns: 1fr;
             }
-            
-            .hero-buttons button {
-                width: 100%;
-                max-width: 300px;
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
+
+            .stat-item h3 { font-size: 1.8rem; }
+
+            .cta h2 { font-size: 1.9rem; }
         }
-        
-        @media (max-width: 576px) {
-            .hero {
-                padding: 130px 0 80px;
-            }
-            
-            .features, .benefits, .testimonials, .pricing, .cta-section {
-                padding: 70px 0;
-            }
-            
-            .feature-card, .testimonial {
-                padding: 25px;
-            }
-            
-            .plan-price {
-                font-size: 36px;
-            }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
 <body>
-    <!-- Header & Navigation -->
+    <!-- 顶部导航 -->
     <header>
-        <div class="container">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <span>蔚蓝守护<small>BLUE GUARDIANS</small></span>
+            </div>
             <nav>
-                <div class="logo">
-                    <div class="logo-icon"><i class="fas fa-bezier-curve"></i></div>
-                    <div class="logo-text">Code<span>Flow</span></div>
-                </div>
-                
-                <ul class="nav-links">
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#benefits">Benefits</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="#">Resources</a></li>
+                <button class="mobile-menu" aria-label="打开菜单" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul id="nav-list">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#about">关于海洋</a></li>
+                    <li><a href="#initiatives">行动项目</a></li>
+                    <li><a href="#actions">日常行动</a></li>
+                    <li><a href="#get-involved">参与我们</a></li>
+                    <li><a href="#contact">联系我们</a></li>
                 </ul>
-                
-                <button class="cta-button">Start Free Trial</button>
-                <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>Build Apps Faster With <span>Visual Development</span></h1>
-                    <p>CodeFlow empowers teams to create enterprise-grade applications with minimal coding. Drag, drop, and connect components to build powerful web and mobile apps in record time.</p>
-                    <div class="hero-buttons">
-                        <button class="cta-button">Start Building Free</button>
-                        <button class="secondary-button">Watch Demo</button>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="CodeFlow Platform Interface">
-                </div>
+    <!-- 主视觉 -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <h1>守护蔚蓝海洋<br>留住生命之源</h1>
+            <p>海洋覆盖了地球表面的 71%，是我们共同的家园。从减少一片塑料开始，和全球的守护者一起，让这片蓝色重新清澈起来。</p>
+            <div class="btn-row">
+                <a href="#get-involved" class="btn">加入守护行动</a>
+                <a href="#about" class="btn ghost">了解海洋现状</a>
             </div>
+        </div>
+        <div class="hero-wave" aria-hidden="true">
+            <svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,32 C240,58 480,6 720,22 C960,38 1200,56 1440,28 L1440,60 L0,60 Z"></path></svg>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
+    <!-- 关于海洋 -->
+    <section id="about">
         <div class="container">
             <div class="section-title">
-                <h2>Powerful Features for Rapid Development</h2>
-                <p>CodeFlow provides all the tools you need to build, deploy, and scale applications without writing extensive code.</p>
+                <h2>关于海洋</h2>
+                <p>海洋调节气候、孕育生命、供养数十亿人——它值得我们认真对待。</p>
             </div>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <h3>Visual Builder</h3>
-                    <p>Drag and drop UI components to design responsive interfaces. Connect data sources with simple point-and-click actions.</p>
+            <div class="about-content">
+                <div class="about-img">
+                    <img src="https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="一只绿海龟在清澈的浅海海底游动" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://images.weserv.nl/?url=images.unsplash.com%2Fphoto-1437622368342-7a3d73a34c8f&w=1600&q=80';">
                 </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>Database Integration</h3>
-                    <p>Connect to any data source with built-in connectors. Automatically generate CRUD operations without writing SQL.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Cross-Platform</h3>
-                    <p>Build once, deploy everywhere. Generate applications for web, iOS, and Android from a single visual design.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <h3>Extensible with Code</h3>
-                    <p>Add custom functionality with JavaScript when needed. Our platform doesn't limit your creativity or complexity.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Enterprise Security</h3>
-                    <p>Built-in authentication, authorization, and data encryption. SOC2 compliant with enterprise-grade security features.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3>One-Click Deployment</h3>
-                    <p>Deploy to cloud or on-premises with a single click. Automatic scaling and monitoring included.</p>
+                <div class="about-text">
+                    <h3>我们的使命</h3>
+                    <p>海洋是地球最大的生态系统：它<span class="hl">吸收了约三成人类排放的二氧化碳</span>，海洋浮游植物贡献了地球上一半以上的氧气。从珊瑚礁到深海，数以亿计的生命栖居其中。</p>
+                    <p>但海洋正在承压：塑料垃圾、过度捕捞、海水升温与酸化，让珊瑚白化、海龟误食塑料、渔业资源衰退。问题来自陆地，答案也在陆地上——在我们每个人的日常选择里。</p>
+                    <p>我们通过科学监测、公众教育与社区行动，推动减塑、护礁与可持续渔业，让保护从口号变成习惯。</p>
+                    <a href="#initiatives" class="btn">看看我们在做什么</a>
                 </div>
             </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-earth-asia"></i>
+                    <h3><span class="counter" data-target="71">71</span><span class="unit">%</span></h3>
+                    <p>海洋覆盖地球表面</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-wind"></i>
+                    <h3><span class="counter" data-target="50">50</span><span class="unit">%+</span></h3>
+                    <p>地球氧气来自海洋</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-bottle-water"></i>
+                    <h3><span class="counter" data-target="1100">1,100</span><span class="unit">万吨</span></h3>
+                    <p>塑料每年流入海洋</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-fish"></i>
+                    <h3><span class="counter" data-target="240000">240,000</span><span class="unit">+</span></h3>
+                    <p>已被发现的海洋物种</p>
+                </div>
+            </div>
+            <p class="stats-note">数据为联合国及海洋科学界广泛引用的量级估算，用于帮助理解海洋的重要性与压力。</p>
         </div>
     </section>
 
-    <!-- Benefits Section -->
-    <section class="benefits" id="benefits">
+    <!-- 行动项目 -->
+    <section class="initiatives" id="initiatives">
         <div class="container">
             <div class="section-title">
-                <h2>Why Choose CodeFlow?</h2>
-                <p>Join thousands of companies accelerating their digital transformation with low-code development.</p>
+                <h2>行动项目</h2>
+                <p>三个长期方向：修复栖息地、清除污染、守护海洋生物。</p>
             </div>
-            
-            <div class="benefits-grid">
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-bolt"></i>
+            <div class="initiatives-grid">
+                <article class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1546026423-cc4642628d2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="色彩斑斓的珊瑚群落" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://images.weserv.nl/?url=images.unsplash.com%2Fphoto-1546026423-cc4642628d2b&w=1200&q=80';">
                     </div>
-                    <h3>10x Faster Development</h3>
-                    <p>Build applications in days instead of months with visual development tools.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-money-bill-wave"></i>
+                    <div class="initiative-content">
+                        <h3><i class="fas fa-seedling"></i>珊瑚礁修复</h3>
+                        <p>珊瑚礁只占海底面积不到 1%，却养育了约四分之一的海洋物种。我们在退化礁区培育并移植珊瑚断枝，监测水温与白化情况，为鱼群重建家园。</p>
+                        <a href="#actions" class="btn">如何参与</a>
                     </div>
-                    <h3>Reduce Costs by 70%</h3>
-                    <p>Lower development and maintenance costs with fewer resources required.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-users"></i>
+                </article>
+                <article class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="志愿者在海滩上清理塑料垃圾" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://images.weserv.nl/?url=images.unsplash.com%2Fphoto-1618477461853-cf6ed80faba5&w=1200&q=80';">
                     </div>
-                    <h3>Citizen Developers</h3>
-                    <p>Enable business users to build solutions with minimal IT assistance.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-chart-line"></i>
+                    <div class="initiative-content">
+                        <h3><i class="fas fa-trash-arrow-up"></i>净滩与减塑</h3>
+                        <p>组织海岸线清洁行动，记录垃圾类型与来源，用数据推动源头减量。同时推广可重复使用的替代品，让塑料在进入海洋之前就被拦下来。</p>
+                        <a href="#actions" class="btn">如何参与</a>
                     </div>
-                    <h3>Scale Effortlessly</h3>
-                    <p>From prototype to enterprise-scale applications with the same platform.</p>
-                </div>
+                </article>
+                <article class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1568430462989-44163eb1752f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="一头座头鲸跃出海面" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://images.weserv.nl/?url=images.unsplash.com%2Fphoto-1568430462989-44163eb1752f&w=1200&q=80';">
+                    </div>
+                    <div class="initiative-content">
+                        <h3><i class="fas fa-otter"></i>海洋生物保护</h3>
+                        <p>守护鲸、海龟、海鸟等旗舰物种的栖息地与迁徙通道，救助搁浅与误捕个体，并倡导负责任的观鲸与可持续渔业，给它们留出生存空间。</p>
+                        <a href="#actions" class="btn">如何参与</a>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="testimonials" id="testimonials">
+    <!-- 日常行动 -->
+    <section id="actions">
         <div class="container">
             <div class="section-title">
-                <h2>Trusted by Industry Leaders</h2>
-                <p>See what our customers have to say about their experience with CodeFlow.</p>
+                <h2>从日常做起</h2>
+                <p>不需要出海，六个小习惯就能为海洋减负。</p>
             </div>
-            
-            <div class="testimonial-slider">
-                <div class="testimonial">
-                    <div class="testimonial-text">
-                        "CodeFlow transformed how we deliver solutions to our business units. What used to take 6 months now takes 3 weeks. Our development team can focus on complex problems while business teams build their own solutions."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">SC</div>
-                        <div class="author-info">
-                            <h4>Sarah Chen</h4>
-                            <p>CTO, TechGrowth Inc.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ol class="actions-list">
+                <li><span class="num">1</span><div><strong>自带水杯与购物袋</strong><span>拒绝一次性塑料瓶、塑料袋和吸管——它们是最常见的海漂垃圾。</span></div></li>
+                <li><span class="num">2</span><div><strong>吃可持续的海鲜</strong><span>避开幼鱼和濒危物种，选择有生态认证、来源清楚的渔获。</span></div></li>
+                <li><span class="num">3</span><div><strong>海边只留下脚印</strong><span>游玩后带走全部垃圾，不捡拾、不投喂、不触摸海洋生物。</span></div></li>
+                <li><span class="num">4</span><div><strong>选对防晒与洗护</strong><span>优先选择对珊瑚友好的防晒产品，减少微塑料磨砂颗粒流入下水道。</span></div></li>
+                <li><span class="num">5</span><div><strong>参加一次净滩</strong><span>每月花两小时清理一段海岸，顺手的数据记录还能支持环保政策。</span></div></li>
+                <li><span class="num">6</span><div><strong>把海洋讲给更多人</strong><span>分享可靠的海保知识，让更多人知道：保护海洋，就是保护我们自己。</span></div></li>
+            </ol>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
+    <!-- 号召参与 -->
+    <section class="cta" id="get-involved">
         <div class="container">
-            <div class="section-title">
-                <h2>Simple, Transparent Pricing</h2>
-                <p>Choose the plan that fits your needs. All plans include core features with no hidden fees.</p>
-            </div>
-            
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3 class="plan-name">Starter</h3>
-                    <div class="plan-price">$29<span>/month</span></div>
-                    <ul class="plan-features">
-                        <li>Up to 5 users</li>
-                        <li>10 GB storage</li>
-                        <li>Basic components</li>
-                        <li>Community support</li>
-                        <li>1 production app</li>
-                    </ul>
-                    <button class="secondary-button">Get Started</button>
-                </div>
-                
-                <div class="pricing-card featured">
-                    <div class="featured-badge">Most Popular</div>
-                    <h3 class="plan-name">Professional</h3>
-                    <div class="plan-price">$89<span>/month</span></div>
-                    <ul class="plan-features">
-                        <li>Up to 25 users</li>
-                        <li>100 GB storage</li>
-                        <li>All components</li>
-                        <li>Priority support</li>
-                        <li>10 production apps</li>
-                        <li>Custom branding</li>
-                    </ul>
-                    <button class="cta-button">Try Free for 14 Days</button>
-                </div>
-                
-                <div class="pricing-card">
-                    <h3 class="plan-name">Enterprise</h3>
-                    <div class="plan-price">Custom</div>
-                    <ul class="plan-features">
-                        <li>Unlimited users</li>
-                        <li>Unlimited storage</li>
-                        <li>All features included</li>
-                        <li>24/7 dedicated support</li>
-                        <li>Unlimited apps</li>
-                        <li>On-premises option</li>
-                    </ul>
-                    <button class="secondary-button">Contact Sales</button>
-                </div>
-            </div>
+            <h2>加入这场蓝色守护</h2>
+            <p>无论是参加一次净滩、每月捐出一杯咖啡的钱，还是把这一页转发给朋友——每一个行动，都会让海洋离清澈更近一点。</p>
+            <a href="#actions" class="btn">从今天开始行动</a>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Start Building Today</h2>
-            <p>Join over 10,000 companies that use CodeFlow to accelerate their application development. No credit card required for the free trial.</p>
-            <button class="cta-button">Get Started for Free</button>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
+    <!-- 页脚 -->
+    <footer id="contact">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <div class="logo">
-                        <div class="logo-icon"><i class="fas fa-bezier-curve"></i></div>
-                        <div class="logo-text">Code<span>Flow</span></div>
+                    <h3>蔚蓝守护</h3>
+                    <p>一个面向公众的海洋保护倡议：用科学、教育与社区行动，守护我们共同的蓝色家园。</p>
+                    <div class="social-links">
+                        <a href="#home" aria-label="微博"><i class="fab fa-weibo"></i></a>
+                        <a href="#home" aria-label="微信"><i class="fab fa-weixin"></i></a>
+                        <a href="#home" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+                        <a href="#home" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
-                    <p style="margin-top: 20px; color: #aaa;">The leading visual development platform for building enterprise applications with minimal coding.</p>
                 </div>
-                
                 <div class="footer-column">
-                    <h3>Product</h3>
+                    <h3>快速导航</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Features</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">Use Cases</a></li>
-                        <li><a href="#">Integrations</a></li>
-                        <li><a href="#">Roadmap</a></li>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#about">关于海洋</a></li>
+                        <li><a href="#initiatives">行动项目</a></li>
+                        <li><a href="#actions">日常行动</a></li>
+                        <li><a href="#get-involved">参与我们</a></li>
                     </ul>
                 </div>
-                
                 <div class="footer-column">
-                    <h3>Resources</h3>
+                    <h3>我们的项目</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Tutorials</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Community</a></li>
-                        <li><a href="#">Support</a></li>
+                        <li><a href="#initiatives">珊瑚礁修复</a></li>
+                        <li><a href="#initiatives">净滩与减塑</a></li>
+                        <li><a href="#initiatives">海洋生物保护</a></li>
+                        <li><a href="#actions">日常减塑清单</a></li>
+                        <li><a href="#about">海洋科普</a></li>
                     </ul>
                 </div>
-                
                 <div class="footer-column">
-                    <h3>Company</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
+                    <h3>联系我们</h3>
+                    <p><i class="fas fa-location-dot"></i> 中国 · 沿海各城市净滩点</p>
+                    <p><i class="fas fa-envelope"></i> hello@blueguardians.example</p>
+                    <p><i class="fas fa-clock"></i> 净滩活动：每月第一周周六</p>
                 </div>
             </div>
-            
             <div class="copyright">
-                <p>&copy; 2023 CodeFlow. All rights reserved.</p>
+                <p>&copy; 2026 蔚蓝守护 Blue Guardians · 保护海洋，人人有责</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Mobile menu toggle
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-            
-            // Adjust for mobile
-            if (window.innerWidth <= 768) {
-                if (navLinks.style.display === 'flex') {
-                    navLinks.style.flexDirection = 'column';
-                    navLinks.style.position = 'absolute';
-                    navLinks.style.top = '80px';
-                    navLinks.style.left = '0';
-                    navLinks.style.width = '100%';
-                    navLinks.style.backgroundColor = 'white';
-                    navLinks.style.padding = '20px';
-                    navLinks.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-                    
-                    const navItems = document.querySelectorAll('.nav-links li');
-                    navItems.forEach(item => {
-                        item.style.margin = '10px 0';
-                    });
-                }
-            }
+        // 移动端菜单
+        var menuBtn = document.querySelector('.mobile-menu');
+        var navList = document.getElementById('nav-list');
+        menuBtn.addEventListener('click', function () {
+            var open = navList.classList.toggle('active');
+            menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
-        
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if(targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if(targetElement) {
+
+        // 数字滚动动画（滚动到统计区时触发）
+        function formatNum(n) {
+            return n.toLocaleString('zh-CN');
+        }
+        function animateCounter(el) {
+            var target = parseInt(el.getAttribute('data-target'), 10);
+            var duration = 1600;
+            var start = null;
+            function step(ts) {
+                if (!start) start = ts;
+                var p = Math.min((ts - start) / duration, 1);
+                var eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = formatNum(Math.round(target * eased));
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+        var counterObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+        document.querySelectorAll('.counter').forEach(function (el) {
+            counterObserver.observe(el);
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+            anchor.addEventListener('click', function (e) {
+                var targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                var targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
                     window.scrollTo({
-                        top: targetElement.offsetTop - 80,
+                        top: targetElement.getBoundingClientRect().top + window.pageYOffset - 72,
                         behavior: 'smooth'
                     });
-                    
-                    // Close mobile menu if open
-                    if(window.innerWidth <= 768) {
-                        document.querySelector('.nav-links').style.display = 'none';
-                    }
+                    navList.classList.remove('active');
+                    menuBtn.setAttribute('aria-expanded', 'false');
                 }
             });
         });
-        
-        // Simple testimonial slider
-        const testimonials = [
-            {
-                text: "CodeFlow transformed how we deliver solutions to our business units. What used to take 6 months now takes 3 weeks. Our development team can focus on complex problems while business teams build their own solutions.",
-                name: "Sarah Chen",
-                position: "CTO, TechGrowth Inc.",
-                initials: "SC"
-            },
-            {
-                text: "We reduced our app development time by 80% using CodeFlow. The visual interface made it easy for our analysts to build data dashboards without waiting for IT resources.",
-                name: "Marcus Johnson",
-                position: "Director of Operations, DataCorp",
-                initials: "MJ"
-            },
-            {
-                text: "As a non-technical founder, CodeFlow allowed me to build our MVP in just 2 months. I could test ideas quickly and iterate based on user feedback without deep coding knowledge.",
-                name: "Lisa Wang",
-                position: "Founder, StartupLabs",
-                initials: "LW"
-            }
-        ];
-        
-        let currentTestimonial = 0;
-        const testimonialElement = document.querySelector('.testimonial');
-        
-        function rotateTestimonial() {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            updateTestimonial();
-        }
-        
-        function updateTestimonial() {
-            const testimonial = testimonials[currentTestimonial];
-            testimonialElement.innerHTML = `
-                <div class="testimonial-text">"${testimonial.text}"</div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">${testimonial.initials}</div>
-                    <div class="author-info">
-                        <h4>${testimonial.name}</h4>
-                        <p>${testimonial.position}</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Auto-rotate testimonials every 5 seconds
-        setInterval(rotateTestimonial, 5000);
-        
-        // CTA button interactions
-        document.querySelectorAll('.cta-button').forEach(button => {
-            button.addEventListener('click', function() {
-                alert('Thank you for your interest in CodeFlow! You would be redirected to the signup page in a real implementation.');
-            });
-        });
-        
-        // Pricing card interactions
-        document.querySelectorAll('.pricing-card button').forEach(button => {
-            button.addEventListener('click', function() {
-                const planName = this.closest('.pricing-card').querySelector('.plan-name').textContent;
-                alert(`You selected the ${planName} plan. In a real implementation, you would be redirected to the checkout process.`);
-            });
-        });
-    </script>
+    
+        // 主视觉图加载失败时（Unsplash 打不开）换 weserv 镜像源
+        (function () {
+            var heroImg = new Image();
+            heroImg.onerror = function () {
+                var hero = document.querySelector('.hero');
+                if (hero) hero.style.backgroundImage = "linear-gradient(rgba(4, 47, 72, 0.62), rgba(8, 74, 110, 0.38)), url('https://images.weserv.nl/?url=images.unsplash.com%2Fphoto-1518837695005-2083093ee35b&w=1600&q=80')";
+            };
+            heroImg.src = 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80';
+        })();
+</script>
 </body>
 </html>
