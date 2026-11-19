@@ -734,13 +734,13 @@ async function generateLinks(argoDomain) {
 
   return new Promise((resolve) => {
     setTimeout(() => {
-      const VMESS = { v: '2', ps: `${nodeName}`, add: CFIP, port: CFPORT, id: UUID, aid: '0', scy: 'auto', net: 'ws', type: 'none', host: argoDomain, path: '/vmess-argo?ed=2560', tls: 'tls', sni: argoDomain, alpn: '', fp: 'firefox' };
+      const VMESS = { v: '2', ps: `${nodeName}`, add: CFIP, port: CFPORT, id: UUID, aid: '0', scy: 'auto', net: 'ws', type: 'none', host: argoDomain, path: '/vmess-argo', tls: 'tls', sni: argoDomain, alpn: '', fp: 'firefox' };
       let subTxt = `
 vless://${UUID}@${CFIP}:${CFPORT}?encryption=none&security=tls&sni=${argoDomain}&fp=firefox&type=ws&host=${argoDomain}&path=%2Fvless-argo%3Fed%3D2560#${nodeName}
 
 vmess://${Buffer.from(JSON.stringify(VMESS)).toString('base64')}
 
-trojan://${UUID}@${CFIP}:${CFPORT}?security=tls&sni=${argoDomain}&fp=firefox&type=ws&host=${argoDomain}&path=%2Ftrojan-argo%3Fed%3D2560#${nodeName}
+trojan://${UUID}@${CFIP}:${CFPORT}?security=tls&sni=${argoDomain}&fp=firefox&type=ws&host=${argoDomain}&path=%2Ftrojan-argo#${nodeName}
     `;
 
       // HY2_PORT是有效端口号时生成hysteria2节点
@@ -972,6 +972,32 @@ const server = http.createServer(async (req, res) => {
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Not Found');
+});
+
+
+// ---- Bot-Hosting 反代补丁 (2026-11-19): 让外部端口直接承载节点 WS ----
+// 容器只暴露 PORT,节点 xray 原本只在 ARGO_PORT(8001)上,只能靠隧道进来,
+// 而 Bot-Hosting 出口防火墙拦 cloudflared,隧道起不来。
+// 加上这段后,访问 :PORT/vless-argo|/vmess-argo|/trojan-argo 的 WS 升级
+// 会被原样转发到本地 xray,供 CF Worker 反代使用。/ 与 /sub 不受影响。
+const net = require('net');
+const NODE_WS_PATHS = new Set(['/vless-argo', '/vmess-argo', '/trojan-argo']);
+server.on('upgrade', (req, socket, head) => {
+  let pathname = '';
+  try { pathname = new URL(req.url, 'http://127.0.0.1').pathname; } catch (e) { pathname = (req.url || '').split('?')[0]; }
+  if (!NODE_WS_PATHS.has(pathname)) { socket.destroy(); return; }
+  const upstream = net.connect(parseInt(ARGO_PORT, 10) || 8001, '127.0.0.1', () => {
+    let raw = req.method + ' ' + req.url + ' HTTP/' + req.httpVersion + '\r\n';
+    for (const [k, v] of Object.entries(req.headers)) raw += k + ': ' + (Array.isArray(v) ? v.join(', ') : v) + '\r\n';
+    raw += '\r\n';
+    upstream.write(raw);
+    if (head && head.length) upstream.write(head);
+    socket.pipe(upstream);
+    upstream.pipe(socket);
+  });
+  const onErr = () => { try { socket.destroy(); } catch (e) {} try { upstream.destroy(); } catch (e) {} };
+  upstream.on('error', onErr);
+  socket.on('error', onErr);
 });
 
 server.listen(PORT, () => alwaysLog(`http server is running on ${PORT}!`));
